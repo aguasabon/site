@@ -3,26 +3,363 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notes — [Your Name]</title>
+  <title>Recipes — [Your Name]</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .main.recipe-main {
+      padding: 0;
+      max-width: none;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .recipe-col {
+      width: 100%;
+      max-width: 620px;
+      background-color: var(--scrap-col);
+      padding: 3.5rem 2.5rem;
+      min-height: 100vh;
+    }
+
+    .recipe-col > h1 {
+      margin-bottom: 0.25rem;
+    }
+
+    .col-intro {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+
+    /* tag filter bar */
+    .tag-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .tag-btn {
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tag-btn:hover {
+      background-color: var(--border);
+      color: var(--text);
+    }
+
+    .tag-btn.active {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* recipe entries */
+    .recipe-entry {
+      margin-bottom: 3.5rem;
+      padding-bottom: 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .recipe-entry:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .recipe-entry.hidden {
+      display: none;
+    }
+
+    .recipe-entry h2 {
+      font-family: Baskerville, "Baskerville Old Face", Garamond, serif;
+      font-size: 1.2rem;
+      font-weight: normal;
+      font-style: italic;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--text);
+      margin: 0 0 0.25rem;
+    }
+
+    .recipe-meta {
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .recipe-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .recipe-tag {
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.5rem;
+    }
+
+    .recipe-note {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .recipe-section-label {
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.4rem;
+      margin-top: 1.25rem;
+    }
+
+    .ingredients {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.5rem;
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    .ingredients li {
+      padding: 0.2rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ingredients li:last-child {
+      border-bottom: none;
+    }
+
+    .method {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      counter-reset: method-counter;
+      font-size: 0.92rem;
+      line-height: 1.75;
+    }
+
+    .method li {
+      counter-increment: method-counter;
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .method li:last-child {
+      border-bottom: none;
+    }
+
+    .method li::before {
+      content: counter(method-counter);
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 1.25rem;
+      padding-top: 0.25rem;
+    }
+
+    .no-results {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
-   <aside class="sidebar">
-    <span class="sidebar-title">The Caves of Altamira</span>
+  <aside class="sidebar">
+    <span class="sidebar-title">[Your Name]<br>IB English · Hawaii</span>
     <nav>
-      <a href="index.html" class="active">Home</a>
+      <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="english/english-index.html">English</a>
+      <a href="english/index.html">English</a>
       <a href="scrapbook.html">Scrapbook</a>
-      <a href="recipes.html">Recipes</a>
+      <a href="recipes.html" class="active">Recipes</a>
     </nav>
   </aside>
 
-  <main class="main">
-    <h1>Notes</h1>
-    <p>[This page is a placeholder. Rename it and fill it in when you know what it's for.]</p>
+  <main class="main recipe-main">
+    <div class="recipe-col">
+
+      <h1>Recipes</h1>
+      <p class="col-intro">A personal record. Nothing formal.</p>
+
+      <div class="tag-bar" id="tag-bar"></div>
+      <div id="recipe-list"></div>
+      <p class="no-results" id="no-results">No recipes with that tag.</p>
+
+    </div>
   </main>
+
+  <script>
+    // ============================================================
+    // RECIPE DATA
+    // To add a recipe: copy one object, paste it at the top of
+    // the array, and fill in the fields. Tags can be anything.
+    // ============================================================
+    const recipes = [
+      {
+        title: "Roast Chicken with Herbs",
+        meta: "Serves 4 · 1 hr 30 min",
+        tags: ["poultry", "dinner", "simple"],
+        note: "The simplest version of this is also the best. Don't overcomplicate it. A hot oven and good butter are the whole argument.",
+        ingredients: [
+          "1 whole chicken, about 1.5 kg",
+          "50g unsalted butter, softened",
+          "1 lemon, halved",
+          "4 garlic cloves, unpeeled",
+          "Fresh thyme and rosemary",
+          "Salt and black pepper"
+        ],
+        method: [
+          "Preheat oven to 220°C. Pat the chicken dry and let it come to room temperature for 30 minutes.",
+          "Rub the butter all over the chicken, working some under the breast skin. Season generously with salt and pepper.",
+          "Stuff the cavity with the lemon halves, garlic, and half the herbs. Scatter the rest in the roasting tin.",
+          "Roast for 20 minutes at 220°C, then reduce to 180°C and continue for 50–60 minutes until the juices run clear.",
+          "Rest for at least 15 minutes before carving."
+        ]
+      },
+      {
+        title: "Pasta e Fagioli",
+        meta: "Serves 4 · 45 min",
+        tags: ["pasta", "vegetarian", "dinner", "simple"],
+        note: "This is peasant food in the best sense: cheap, filling, and genuinely good. Better the next day if there's any left.",
+        ingredients: [
+          "2 cans cannellini beans, drained",
+          "200g small pasta (ditalini or broken spaghetti)",
+          "1 can whole plum tomatoes",
+          "4 garlic cloves, sliced",
+          "1 sprig rosemary",
+          "Parmesan rind (if you have one)",
+          "Olive oil, salt, chilli flakes"
+        ],
+        method: [
+          "Warm a generous amount of olive oil in a heavy pot over medium heat. Add garlic and chilli and cook gently until fragrant, about 2 minutes.",
+          "Add the tomatoes, crushing them with your hand as they go in. Add the rosemary sprig and parmesan rind if using. Simmer 10 minutes.",
+          "Add the beans and enough water to make a thick soup. Simmer another 10 minutes. Remove the rosemary.",
+          "Mash roughly with the back of a spoon — you want some beans whole, some broken down.",
+          "Add the pasta directly to the pot and cook until just done, adding water as needed. Serve with good olive oil over the top."
+        ]
+      },
+      {
+        title: "Cucumber and Sesame Salad",
+        meta: "Serves 2 · 10 min",
+        tags: ["salad", "vegetarian", "quick", "sides"],
+        note: "A good thing to know how to make quickly. Works alongside almost anything.",
+        ingredients: [
+          "2 cucumbers",
+          "1 tbsp sesame oil",
+          "1 tbsp rice vinegar",
+          "1 tsp soy sauce",
+          "1 tsp sugar",
+          "Toasted sesame seeds",
+          "Chilli flakes or fresh chilli (optional)"
+        ],
+        method: [
+          "Slice cucumbers thinly. Toss with a pinch of salt and leave in a colander for 10 minutes, then squeeze out the excess water.",
+          "Mix the sesame oil, rice vinegar, soy sauce, and sugar until the sugar dissolves.",
+          "Toss the cucumbers in the dressing. Scatter with sesame seeds and chilli if using. Serve immediately."
+        ]
+      }
+    ];
+
+    // ============================================================
+    // BUILD TAG BUTTONS
+    // ============================================================
+    const allTags = ["all", ...new Set(recipes.flatMap(r => r.tags).sort())];
+    let activeTag = "all";
+
+    const tagBar = document.getElementById("tag-bar");
+    allTags.forEach(tag => {
+      const btn = document.createElement("button");
+      btn.className = "tag-btn" + (tag === "all" ? " active" : "");
+      btn.textContent = tag;
+      btn.addEventListener("click", () => {
+        activeTag = tag;
+        document.querySelectorAll(".tag-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterRecipes();
+      });
+      tagBar.appendChild(btn);
+    });
+
+    // ============================================================
+    // RENDER RECIPES
+    // ============================================================
+    function renderRecipes() {
+      const list = document.getElementById("recipe-list");
+      recipes.forEach(recipe => {
+        const entry = document.createElement("div");
+        entry.className = "recipe-entry";
+        entry.dataset.tags = recipe.tags.join(" ");
+        entry.innerHTML = `
+          <h2>${recipe.title}</h2>
+          <span class="recipe-meta">${recipe.meta}</span>
+          <div class="recipe-tags">
+            ${recipe.tags.map(t => `<span class="recipe-tag">${t}</span>`).join("")}
+          </div>
+          <p class="recipe-note">${recipe.note}</p>
+          <span class="recipe-section-label">Ingredients</span>
+          <ul class="ingredients">
+            ${recipe.ingredients.map(i => `<li>${i}</li>`).join("")}
+          </ul>
+          <span class="recipe-section-label">Method</span>
+          <ol class="method">
+            ${recipe.method.map(s => `<li><span>${s}</span></li>`).join("")}
+          </ol>
+        `;
+        list.appendChild(entry);
+      });
+    }
+
+    // ============================================================
+    // FILTER
+    // ============================================================
+    function filterRecipes() {
+      const entries = document.querySelectorAll(".recipe-entry");
+      let visible = 0;
+      entries.forEach(entry => {
+        const tags = entry.dataset.tags.split(" ");
+        const show = activeTag === "all" || tags.includes(activeTag);
+        entry.classList.toggle("hidden", !show);
+        if (show) visible++;
+      });
+      document.getElementById("no-results").style.display = visible === 0 ? "block" : "none";
+    }
+
+    renderRecipes();
+  </script>
 
 </body>
 </html>
